@@ -5,7 +5,7 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-BUG_MODE = os.getenv("BUG_MODE", "false")
+BUG_MODE = os.getenv("BUG_MODE", "true")
 
 facts = [
     "Average load over 5 minutes: 0.5",
