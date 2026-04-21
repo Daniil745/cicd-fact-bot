@@ -43,7 +43,7 @@ pipeline {
         stage('Deploy to VM2') {
             steps {
                 echo 'Deploying to production server...'
-                sshagent(['vm2-ssh-key']) {
+                sshagent(['vm2-sshkey']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${TARGET_USER}@${TARGET_HOST} "
                             mkdir -p /opt/fact-bot &&
