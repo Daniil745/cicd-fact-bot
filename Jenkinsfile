@@ -1,44 +1,93 @@
 pipeline {
     agent any
-
+    
+    environment {
+        DOCKERHUB_USER = 'daniil9090'
+        APP_NAME = 'fact-bot'
+        TARGET_HOST = '192.168.1.104'
+        TARGET_USER = 'daniil'
+        VERSION = "build-${BUILD_NUMBER}"
+    }
+    
     stages {
-	stage('Checkout') {
-	    steps {
-		echo 'Cloning repository...'
+        stage('Checkout') {
+            steps {
+                echo 'Cloning repository...'
                 checkout scm
             }
         }
-	
-	stage('Test') {
-	    steps {
-	        echo 'Running test...'
-	        sh 'echo "All test passed"'
+        
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh """
+                    cd app
+                    docker build -t ${DOCKERHUB_USER}/${APP_NAME}:${VERSION} .
+                    docker tag ${DOCKERHUB_USER}/${APP_NAME}:${VERSION} ${DOCKERHUB_USER}/${APP_NAME}:latest
+                """
             }
         }
-
-	stage('Build docker image') {
-	    steps {
-		echo 'Building docker image...'
-		sh 'cd app && docker build -t fact-bot:latest .'
-	    }
-	}
-
-	
-	stage('Deploy to VM2') {
+        
+        stage('Push to Docker Hub') {
             steps {
-		echo 'Deploying to prod server...'
-		sh 'echo "Would to deploy VM2 here"'
-	    }
-	}
+                echo 'Pushing to Docker Hub...'
+                withDockerRegistry([credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/']) {
+                    sh """
+                        docker push ${DOCKERHUB_USER}/${APP_NAME}:${VERSION}
+                        docker push ${DOCKERHUB_USER}/${APP_NAME}:latest
+                    """
+                }
+            }
+        }
+        
+        stage('Deploy to VM2') {
+            steps {
+                echo 'Deploying to production server...'
+                sshagent(['vm2-ssh-key']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${TARGET_USER}@${TARGET_HOST} "
+                            mkdir -p /opt/fact-bot &&
+                            cat > /opt/fact-bot/docker-compose.yml << 'EOF'
+version: '3.8'
+services:
+  fact-bot:
+    image: ${DOCKERHUB_USER}/${APP_NAME}:${VERSION}
+    container_name: fact-bot
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    environment:
+      - BUG_MODE=false
+EOF
+                            cd /opt/fact-bot &&
+                            docker pull ${DOCKERHUB_USER}/${APP_NAME}:${VERSION} &&
+                            docker-compose down || true &&
+                            docker-compose up -d
+                        "
+                    """
+                }
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                echo 'Verifying deployment...'
+                script {
+                    sleep 5
+                    sh """
+                        curl -f http://${TARGET_HOST}:5000/health || exit 1
+                    """
+                }
+            }
+        }
     }
-
+    
     post {
-	success {
-	    echo 'Pipeline completed successfully!'
-	}
-	failure {
-	    echo 'Pipeline failed'
-	}
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
     }
-
 }
