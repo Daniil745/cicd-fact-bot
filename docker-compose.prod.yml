@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  fact-bot:
+    image: daniil9090/fact-bot:${VERSION:latest}
+    container_name: fact-bot
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - BUG_MODE=${BUG_MODE:-false}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
