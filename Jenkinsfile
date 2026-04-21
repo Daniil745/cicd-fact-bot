@@ -122,6 +122,17 @@ EOF
     post {
         success {
             echo 'Pipeline completed successfully'
+	    script {
+	       def message = """
+	       Deploy Successfully
+	       Service: ${APP_NAME}
+               Version: ${VERSION}
+	       Time: ${new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())}
+	       URL: http://${TARGET_HOST}:5000
+	       Healthcheck: PASSED
+	       """
+	       sendTelegramMessage(message)
+	    }
         }
         failure {
             echo 'Pipeline failed'
@@ -156,5 +167,20 @@ EOF
                 }
             }
         }
+    }
+}
+
+def sendTelegramMessage(String message) {
+    withCredentials([
+        string(credentialsId: 'tg-bot', variable: 'TELEGRAM_TOKEN'),
+        string(credentialsId: 'id-user-tg', variable: 'CHAT_ID')
+    ]) {
+        sh """
+            curl -s -X POST \
+                https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage \
+                -H 'Content-Type: application/json' \
+                -d '{"chat_id": "${CHAT_ID}", "text": "${message}"}' \
+                > /dev/null 2>&1 || echo "Telegram notification failed"
+        """
     }
 }
