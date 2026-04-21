@@ -73,7 +73,7 @@ services:
     ports:
       - '5000:5000'
     environment:
-      - BUG_MODE=false
+      - BUG_MODE=true
 EOF
                             cd /opt/fact-bot &&
                             docker pull ${DOCKERHUB_USER}/${APP_NAME}:${VERSION} &&
@@ -143,7 +143,7 @@ services:
     ports:
       - '5000:5000'
     environment:
-      - BUG_MODE=true
+      - BUG_MODE=false
 EOF
                                 docker-compose down || true &&
                                 docker-compose up -d
