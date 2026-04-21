@@ -143,7 +143,7 @@ services:
     ports:
       - '5000:5000'
     environment:
-      - BUG_MODE=false
+      - BUG_MODE=true
 EOF
                                 docker-compose down || true &&
                                 docker-compose up -d
