@@ -22,8 +22,8 @@ def home():
 @app.route('/health')
 def health():
     import time
-    time.sleep(15)
-    return jsonify({"status": "ok", "service": "fact-bot"}), 200
+    time.sleep(25)
+    return jsonify({"status": "ok"}), 200
 
 @app.route('/metrics')
 def metrics():
