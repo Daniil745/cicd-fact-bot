@@ -140,7 +140,7 @@ Docker Hub screenshots:
 
 **Daniil**
 - GitHub: [@Daniil745](https://github.com/Daniil745)
-- Project Link: [https://github.com/Daniil745/todo-app-devops](https://github.com/Daniil745/cicd-project)
+- Project Link: [https://github.com/Daniil745/cicd-fact-bot](https://github.com/Daniil745/cicd-fact-bot)
 
 ##  License
 
