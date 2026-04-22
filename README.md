@@ -136,3 +136,20 @@ Docker Hub screenshots:
 ![image alt](https://github.com/Daniil745/cicd-fact-bot/blob/4e418fa5287a0d1a536000352638ce032970db18/screenshots/dockerhub.png)
 ---
 
+##  Author
+
+**Daniil**
+- GitHub: [@Daniil745](https://github.com/Daniil745)
+- Project Link: [https://github.com/Daniil745/todo-app-devops](https://github.com/Daniil745/cicd-project)
+
+##  License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <sub>If you found this project helpful, please give it a star :)!</sub>
+  <br>
+  <sub>Built with ❤️ for the DevOps community</sub>
+</div>
